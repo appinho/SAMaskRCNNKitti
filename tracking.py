@@ -21,3 +21,6 @@ class Tracking(object):
         self.tracking_list.append(tr)
     def number_of_tracks(self):
         return len(self.tracking_list)
+    def display_tracks(self):
+        for track in self.tracking_list:
+            Track.display_track(track)

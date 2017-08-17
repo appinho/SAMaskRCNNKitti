@@ -41,6 +41,7 @@ for frame in range(0,2,1):
     # Track objects
     t4 = time.time()
     tracker.update(detector.objects,timeframe)
+    tracker.display_tracks()
     t5 = time.time()
     print "Track object in " + str(t5-t4) + "s"
     print "# Tracks " + str(tracker.number_of_tracks())

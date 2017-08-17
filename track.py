@@ -5,12 +5,15 @@ class Track(object):
         self.number_of_states = 4
         self.x = object.x
         self.xp = np.zeros((self.number_of_states,1))
-        self.P = np.zeros((self.number_of_states,self.number_of_states))
-        self.Pp = np.zeros((self.number_of_states,self.number_of_states))
+        self.P = np.eye(self.number_of_states,self.number_of_states)
+        self.Pp = np.eye(self.number_of_states,self.number_of_states)
 
     def display_track(self):
-        print("TRID " + str(self.track_id) +
-              " X " + str(self.x) +
-              " XP " + str(self.xp) +
-              " P " + str(self.P) +
-              " PP " + str(self.Pp))
+        print " X "
+        print self.x
+        print " XP "
+        print self.xp
+        print " P "
+        print self.P
+        print " PP "
+        print self.Pp
