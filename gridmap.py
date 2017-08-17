@@ -4,9 +4,9 @@ from collections import defaultdict
 
 class GridMap(object):
     def __init__(self):
-        self.x_num_cells = 400
-        self.y_num_cells = 400
-        self.cell_size = 0.5
+        self.x_num_cells = 40
+        self.y_num_cells = 40
+        self.cell_size = 4.0
         self.x_range = self.x_num_cells/2*self.cell_size
         self.y_range = self.y_num_cells/2*self.cell_size
         self.height_threshold = 0.5

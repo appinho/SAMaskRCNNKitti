@@ -1,6 +1,7 @@
 from dataset import DataSet
 from gridmap import GridMap
 from detection import Detection
+from tracking import Tracking
 import time
 
 # Choose scenario
@@ -13,9 +14,10 @@ frame_range = range(0,100,1)
 dataset = DataSet(path,date,drive,frame_range)
 grid =GridMap()
 detector = Detection()
+tracker = Tracking()
 
 # Loop through frames
-for frame in range(0,3,1):
+for frame in range(0,2,1):
     print "-----Frame " + str(frame) + "-----"
     point_cloud = dataset.get_point_cloud(frame)
     pose = dataset.get_pose(frame)
@@ -25,7 +27,7 @@ for frame in range(0,3,1):
     t0 = time.time()
     grid.fill_point_cloud_in_grid(point_cloud)
     t1 = time.time()
-    print "Fill grid in" + str(t1-t0) + "s"
+    print "Fill grid in " + str(t1-t0) + "s"
     #grid.display_grid_map()
 
     # Detect objects
@@ -34,4 +36,11 @@ for frame in range(0,3,1):
     detector.find_opencv_objects(grid)
     t3 = time.time()
     print "Detect objects in " + str(t3-t2) + "s"
-    detector.display_detection(grid)
+    #detector.display_detection(grid)
+
+    # Track objects
+    t4 = time.time()
+    tracker.update(detector.objects,timeframe)
+    t5 = time.time()
+    print "Track object in " + str(t5-t4) + "s"
+    print "# Tracks " + str(tracker.number_of_tracks())

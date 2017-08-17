@@ -21,11 +21,10 @@ class Detection(object):
         print "Objects found " + str(self.num_objects)
 
     def create_objects(self,label_out,grid):
-        obj_list = []
-        for row in label_out:
-            obj = Object(row,grid)
-            obj_list.append(obj)
-        self.objects = obj_list
+        self.objects = []
+        for label_id,row in enumerate(label_out):
+            obj = Object(row,grid,label_id)
+            self.objects.append(obj)
 
     def display_detection(self,grid):
         fig, ax = plt.subplots(1)
