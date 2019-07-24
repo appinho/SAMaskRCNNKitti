@@ -135,7 +135,7 @@ class Config(object):
     # train the RPN.
     USE_RPN_ROIS = True
 
-    def __init__(self, height=IMAGE_MAX_DIM, width=IMAGE_MAX_DIM):
+    def __init__(self, IMAGE_MAX_DIM, IMAGE_MAX_DIM):
         """Set values of computed attributes."""
         # Effective batch size
         self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
