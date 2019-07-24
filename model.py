@@ -221,7 +221,7 @@ def clip_boxes_graph(boxes, window):
     return clipped
 
 
-class ProposalLayer(Layer):
+class ProposalLayer(InputLayer):
     """Receives anchor scores and selects a subset to pass as proposals
     to the second stage. Filtering is done based on anchor scores and
     non-max suppression to remove overlaps. It also applies bounding
@@ -315,7 +315,7 @@ def log2_graph(x):
     return tf.log(x) / tf.log(2.0)
 
 
-class PyramidROIAlign(Layer):
+class PyramidROIAlign(InputLayer):
     """Implements ROI Pooling on multiple levels of the feature pyramid.
 
     Params:
@@ -551,7 +551,7 @@ def detection_targets_graph(proposals, gt_boxes, gt_masks, config):
     return rois, roi_gt_boxes[:, 4], deltas, masks
 
 
-class DetectionTargetLayer(Layer):
+class DetectionTargetLayer(InputLayer):
     """Subsamples proposals and generates target box refinment, class_ids,
     and masks for each.
 
@@ -696,7 +696,7 @@ def refine_detections(rois, probs, deltas, window, config):
     return result
 
 
-class DetectionLayer(Layer):
+class DetectionLayer(InputLayer):
     """Takes classified proposal boxes and their bounding box deltas and
     returns the final detection boxes.
 
