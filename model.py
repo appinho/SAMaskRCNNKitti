@@ -19,7 +19,7 @@ import re
 import logging
 from collections import OrderedDict
 import numpy as np
-import scipy.misc
+import cv2
 import tensorflow as tf
 import keras
 import keras.backend as K
@@ -1284,7 +1284,7 @@ def build_detection_targets(rpn_rois, gt_boxes, gt_masks, config):
             gt_h = gt_y2 - gt_y1
             # Resize mini mask to size of GT box
             placeholder[gt_y1:gt_y2, gt_x1:gt_x2] = \
-                np.round(scipy.misc.imresize(class_mask.astype(float), (gt_h, gt_w), 
+                np.round(cv2.resize(class_mask.astype(float), (gt_w, gt_h), 
                                              interp='nearest') / 255.0).astype(bool)
             # Place the mini batch in the placeholder
             class_mask = placeholder
@@ -1292,7 +1292,7 @@ def build_detection_targets(rpn_rois, gt_boxes, gt_masks, config):
         # Pick part of the mask and resize it
         y1, x1, y2, x2 = rois[i][:4].astype(np.int32)
         m = class_mask[y1:y2, x1:x2]
-        mask = scipy.misc.imresize(m.astype(float), config.MASK_SHAPE, interp='nearest') / 255.0
+        mask = cv2.resize(m.astype(float), config.MASK_SHAPE, interp='nearest') / 255.0
         masks[i,:,:,class_id] = mask
         
     return rois, class_ids, bboxes, masks
