@@ -87,7 +87,7 @@ class Config(object):
     IMAGE_MIN_DIM = 800
     IMAGE_MAX_DIM = 1024
     # If True, pad images with zeros such that they're (max_dim by max_dim)
-    IMAGE_PADDING = True  # currently, the False option is not supported
+    IMAGE_PADDING = False  # currently, the False option is not supported
 
     # Image mean (RGB)
     MEAN_PIXEL = np.array([123.7, 116.8, 103.9])
