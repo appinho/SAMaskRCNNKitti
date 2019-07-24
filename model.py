@@ -1955,8 +1955,8 @@ class MaskRCNN():
         the given regular expression.
         """
         # Print message on the first call (but not on recursive calls)
-        if verbose > 0 and keras_model is None:
-            log("Selecting layers to train")
+        #if verbose > 0 and keras_model is None:
+        #    log("Selecting layers to train")
 
         keras_model = keras_model or self.keras_model
 
@@ -1982,8 +1982,8 @@ class MaskRCNN():
             else:
                 layer.trainable = trainable
             # Print trainble layer names
-            if trainable and verbose > 0:
-                log("{}{:20}   ({})".format(" " * indent, layer.name,
+            #if trainable and verbose > 0:
+            #    log("{}{:20}   ({})".format(" " * indent, layer.name,
                                             layer.__class__.__name__))
 
     def set_log_dir(self, model_path=None):
