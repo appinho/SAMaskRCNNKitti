@@ -377,6 +377,7 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
     """
     # Default window (y1, x1, y2, x2) and default scale == 1.
     h, w = image.shape[:2]
+    print("HEIGHT WIDHT", h, w)
     window = (0, 0, h, w)
     scale = 1
 
@@ -393,6 +394,7 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
     if scale != 1:
         image = cv2.resize(
             image, (round(w * scale), round(h * scale)))
+    print("SCALE", scale)
     # Need padding?
     if padding:
         # Get new height and width
@@ -404,6 +406,7 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
+    print(image.shape, window, scale, padding)
     return image, window, scale, padding
 
 
