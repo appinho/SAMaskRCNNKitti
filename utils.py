@@ -13,6 +13,7 @@ import math
 import random
 import numpy as np
 import tensorflow as tf
+import scipy
 import cv2
 import skimage.color
 
