@@ -1984,7 +1984,7 @@ class MaskRCNN():
             # Print trainble layer names
             #if trainable and verbose > 0:
             #    log("{}{:20}   ({})".format(" " * indent, layer.name,
-                                            layer.__class__.__name__))
+            #                                layer.__class__.__name__))
 
     def set_log_dir(self, model_path=None):
         """Sets the model log directory and epoch counter.
