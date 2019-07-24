@@ -433,7 +433,7 @@ def minimize_mask(bbox, mask, mini_shape):
         m = mask[:, :, i]
         y1, x1, y2, x2 = bbox[i][:4]
         m = m[y1:y2, x1:x2]
-        m = cv2.resize(m.astype(float), mini_shape, interp='bilinear')
+        m = cv2.resize(m.astype(float), mini_shape, interpolation=cv2.INTER_AREA)
         mini_mask[:, :, i] = np.where(m >= 128, 1, 0)
     return mini_mask
 
@@ -450,7 +450,7 @@ def expand_mask(bbox, mini_mask, image_shape):
         y1, x1, y2, x2 = bbox[i][:4]
         h = y2 - y1
         w = x2 - x1
-        m = cv2.resize(m.astype(float), (h, w), interp='bilinear')
+        m = cv2.resize(m.astype(float), (h, w), interpolation=cv2.INTER_LINEAR)
         mask[y1:y2, x1:x2, i] = np.where(m >= 128, 1, 0)
     return mask
 
@@ -471,7 +471,7 @@ def unmold_mask(mask, bbox, image_shape):
     threshold = 0.5
     y1, x1, y2, x2 = bbox
     mask = cv2.resize(
-        mask, (y2 - y1, x2 - x1), interp='bilinear').astype(np.float32) / 255.0
+        mask, (y2 - y1, x2 - x1), interpolation=cv2.INTER_LINEAR).astype(np.float32) / 255.0
     mask = np.where(mask >= threshold, 1, 0).astype(np.uint8)
 
     # Put the mask in the right location.
