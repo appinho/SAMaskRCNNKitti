@@ -19,6 +19,7 @@ import re
 import logging
 from collections import OrderedDict
 import numpy as np
+import scipy.misc
 import tensorflow as tf
 import keras
 import keras.backend as K
@@ -26,7 +27,6 @@ import keras.layers as KL
 import keras.initializers as KI
 import keras.engine as KE
 import keras.models as KM
-import cv2
 
 import utils
 
@@ -1119,23 +1119,18 @@ def load_image_gt(dataset, config, image_id, augment=False,
     image = dataset.load_image(image_id)
     mask, class_ids = dataset.load_mask(image_id)
     shape = image.shape
-    #print("C", config.IMAGE_MIN_DIM, config.IMAGE_MAX_DIM)
     image, window, scale, padding = utils.resize_image(
         image, 
         min_dim=config.IMAGE_MIN_DIM, 
         max_dim=config.IMAGE_MAX_DIM,
         padding=config.IMAGE_PADDING)
-    #print("After resize image", image.shape, window, scale, padding)
-    #print("Before resize mask", mask.shape, padding)
     mask = utils.resize_mask(mask, scale, padding)
 
-    #print("After resize mask", mask.shape)
     # Random horizontal flips.
     if augment:
         if random.randint(0, 1):
             image = np.fliplr(image)
             mask = np.fliplr(mask)
-    #print("After augmenting", mask.shape)
 
     # Bounding boxes. Note that some boxes might be all zeros
     # if the corresponding mask got cropped out.
@@ -1154,9 +1149,7 @@ def load_image_gt(dataset, config, image_id, augment=False,
 
     # Resize masks to smaller size to reduce memory usage
     if use_mini_mask:
-        #print("Use mini mask", mask.shape)
         mask = utils.minimize_mask(bbox, mask, config.MINI_MASK_SHAPE)
-        #print(mask.shape)
 
     # Image meta data
     image_meta = compose_image_meta(image_id, shape, window, active_class_ids)
@@ -1291,15 +1284,15 @@ def build_detection_targets(rpn_rois, gt_boxes, gt_masks, config):
             gt_h = gt_y2 - gt_y1
             # Resize mini mask to size of GT box
             placeholder[gt_y1:gt_y2, gt_x1:gt_x2] = \
-                np.round(cv2.resize(class_mask.astype(float), (gt_w, gt_h), 
-                         interpolation=cv2.INTER_NEAREST) / 255.0).astype(bool)
+                np.round(scipy.misc.imresize(class_mask.astype(float), (gt_h, gt_w), 
+                                             interp='nearest') / 255.0).astype(bool)
             # Place the mini batch in the placeholder
             class_mask = placeholder
             
         # Pick part of the mask and resize it
         y1, x1, y2, x2 = rois[i][:4].astype(np.int32)
         m = class_mask[y1:y2, x1:x2]
-        mask = cv2.resize(m.astype(float), config.MASK_SHAPE, interpolation=cv2.INTER_NEAREST) / 255.0
+        mask = scipy.misc.imresize(m.astype(float), config.MASK_SHAPE, interp='nearest') / 255.0
         masks[i,:,:,class_id] = mask
         
     return rois, class_ids, bboxes, masks
@@ -1374,7 +1367,6 @@ def build_rpn_targets(image_shape, anchors, gt_boxes, config):
     ix = 0  # index into rpn_bbox
     # TODO: use box_refinment() rather that duplicating the code here
     for i, a in zip(ids, anchors[ids]):
-        
         # Closest gt box (it might have IoU < 0.7)
         gt = gt_boxes[anchor_iou_argmax[i], :4]
 
@@ -1389,9 +1381,6 @@ def build_rpn_targets(image_shape, anchors, gt_boxes, config):
         a_w = a[3] - a[1]
         a_center_y = a[0] + 0.5 * a_h
         a_center_x = a[1] + 0.5 * a_w
-
-        a_h = max(1e-9, a_h)
-        a_w = max(1e-9, a_w)
 
         # Compute the bbox refinement that the RPN should predict.
         rpn_bbox[ix] = [
@@ -1880,7 +1869,7 @@ class MaskRCNN():
         exlude: list of layer names to excluce
         """
         import h5py
-        from keras.engine import saving
+        from keras.engine import topology
 
         if exclude:
             by_name = True
@@ -1902,9 +1891,9 @@ class MaskRCNN():
             layers = filter(lambda l: l.name not in exclude, layers)
         
         if by_name:
-            saving.load_weights_from_hdf5_group_by_name(f, layers)
+            topology.load_weights_from_hdf5_group_by_name(f, layers)
         else:
-            saving.load_weights_from_hdf5_group(f, layers)
+            topology.load_weights_from_hdf5_group(f, layers)
         if hasattr(f, 'close'):
             f.close()
 
@@ -2121,7 +2110,6 @@ class MaskRCNN():
         for image in images:
             # Resize image to fit the model expected size
             # TODO: move resizing to mold_image()
-            #print("S", self.config.IMAGE_MIN_DIM, elf.config.IMAGE_MAX_DIM)
             molded_image, window, scale, padding = utils.resize_image(
                 image,
                 min_dim=self.config.IMAGE_MIN_DIM,

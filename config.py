@@ -77,15 +77,15 @@ class Config(object):
 
     # If enabled, resizes instance masks to a smaller size to reduce
     # memory load. Recommended when using high-resolution images.
-    USE_MINI_MASK = False
+    USE_MINI_MASK = True
     MINI_MASK_SHAPE = (56, 56)  # (height, width) of the mini-mask
 
     # Input image resing
     # Images are resized such that the smallest side is >= IMAGE_MIN_DIM and
     # the longest side is <= IMAGE_MAX_DIM. In case both conditions can't
     # be satisfied together the IMAGE_MAX_DIM is enforced.
-    IMAGE_MIN_DIM = 400 #800
-    IMAGE_MAX_DIM = 512 #1024
+    IMAGE_MIN_DIM = 800
+    IMAGE_MAX_DIM = 1024
     # If True, pad images with zeros such that they're (max_dim by max_dim)
     IMAGE_PADDING = True  # currently, the False option is not supported
 

@@ -13,11 +13,9 @@ import math
 import random
 import numpy as np
 import tensorflow as tf
+import scipy.misc
 import skimage.color
-import imageio
-from PIL import Image
-import scipy.ndimage
-import cv2
+
 
 ############################################################
 #  Bounding Boxes
@@ -30,16 +28,11 @@ def extract_bboxes(mask):
     Returns: bbox array [num_instances, (y1, x1, y2, x2)].
     """
     boxes = np.zeros([mask.shape[-1], 4], dtype=np.int32)
-    #print("Boxes", mask.shape[-1])
     for i in range(mask.shape[-1]):
-        #print(i)
         m = mask[:, :, i]
-        #print(np.summ)
-        #print(m.shape)
         # Bounding box.
         horizontal_indicies = np.where(np.any(m, axis=0))[0]
         vertical_indicies = np.where(np.any(m, axis=1))[0]
-        #print(horizontal_indicies, vertical_indicies)
         if horizontal_indicies.shape[0]:
             x1, x2 = horizontal_indicies[[0, -1]]
             y1, y2 = vertical_indicies[[0, -1]]
@@ -337,7 +330,7 @@ class Dataset(object):
         """Load the specified image and return a [H,W,3] Numpy array.
         """
         # Load image
-        image = imageio.imread(self.image_info[image_id]['path'])
+        image = scipy.misc.imread(self.image_info[image_id]['path'])
         # If grayscale. Convert to RGB for consistency.
         if image.ndim != 3:
             image = skimage.color.gray2rgb(image)
@@ -385,22 +378,20 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
     h, w = image.shape[:2]
     window = (0, 0, h, w)
     scale = 1
-    #print(min_dim, max_dim, h, w)
+
     # Scale?
     if min_dim:
         # Scale up but not down
         scale = max(1, min_dim / min(h, w))
-    #print("S1", scale)
     # Does it exceed max dim?
     if max_dim:
         image_max = max(h, w)
         if round(image_max * scale) > max_dim:
             scale = max_dim / image_max
-    #print("S2", scale)
     # Resize image and mask
     if scale != 1:
-        image = cv2.resize(image,(round(w * scale), round(h * scale)))
-    #print("After scaling", image.shape)
+        image = scipy.misc.imresize(
+            image, (round(h * scale), round(w * scale)))
     # Need padding?
     if padding:
         # Get new height and width
@@ -412,7 +403,6 @@ def resize_image(image, min_dim=None, max_dim=None, padding=False):
         padding = [(top_pad, bottom_pad), (left_pad, right_pad), (0, 0)]
         image = np.pad(image, padding, mode='constant', constant_values=0)
         window = (top_pad, left_pad, h + top_pad, w + left_pad)
-    #print("After padding", image.shape, scale)
     return image, window, scale, padding
 
 
@@ -426,11 +416,8 @@ def resize_mask(mask, scale, padding):
             [(top, bottom), (left, right), (0, 0)]
     """
     h, w = mask.shape[:2]
-    #print("R M 1", mask.shape)
     mask = scipy.ndimage.zoom(mask, zoom=[scale, scale, 1], order=0)
-    #print("R M 2", mask.shape)
     mask = np.pad(mask, padding, mode='constant', constant_values=0)
-    #print("R M 3", mask.shape)
     return mask
 
 
@@ -441,17 +428,11 @@ def minimize_mask(bbox, mask, mini_shape):
     See inspect_data.ipynb notebook for more details.
     """
     mini_mask = np.zeros(mini_shape + (mask.shape[-1],), dtype=bool)
-    #print(mini_mask.shape)
     for i in range(mask.shape[-1]):
-        #print("i", i)
         m = mask[:, :, i]
         y1, x1, y2, x2 = bbox[i][:4]
-        #print("Box", y1, x1, y2, x2)
         m = m[y1:y2, x1:x2]
-        #print("Mini mask", m.shape)
-        m = cv2.resize(m.astype(float), mini_shape,
-            interpolation = cv2.INTER_LINEAR)
-        #print(m.shape)
+        m = scipy.misc.imresize(m.astype(float), mini_shape, interp='bilinear')
         mini_mask[:, :, i] = np.where(m >= 128, 1, 0)
     return mini_mask
 
@@ -468,9 +449,7 @@ def expand_mask(bbox, mini_mask, image_shape):
         y1, x1, y2, x2 = bbox[i][:4]
         h = y2 - y1
         w = x2 - x1
-        #print("EM", m.shape)
-        m = cv2.resize(m.astype(float), (w, h), interpolation = cv2.INTER_LINEAR)
-        #print(m.shape)
+        m = scipy.misc.imresize(m.astype(float), (h, w), interp='bilinear')
         mask[y1:y2, x1:x2, i] = np.where(m >= 128, 1, 0)
     return mask
 
@@ -490,10 +469,8 @@ def unmold_mask(mask, bbox, image_shape):
     """
     threshold = 0.5
     y1, x1, y2, x2 = bbox
-    #print("Unmold mask", mask.shape, y1, x1, y2, x2)
-    mask = cv2.resize(mask, (x2 - x1, y2 - y1), 
-        interpolation = cv2.INTER_LINEAR).astype(np.float32) / 255.0
-    #print(mask.shape)
+    mask = scipy.misc.imresize(
+        mask, (y2 - y1, x2 - x1), interp='bilinear').astype(np.float32) / 255.0
     mask = np.where(mask >= threshold, 1, 0).astype(np.uint8)
 
     # Put the mask in the right location.
