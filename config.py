@@ -135,13 +135,13 @@ class Config(object):
     # train the RPN.
     USE_RPN_ROIS = True
 
-    def __init__(self):
+    def __init__(self, height=IMAGE_MAX_DIM, width=IMAGE_MAX_DIM):
         """Set values of computed attributes."""
         # Effective batch size
         self.BATCH_SIZE = self.IMAGES_PER_GPU * self.GPU_COUNT
 
         # Input image size
-        self.IMAGE_SHAPE = np.array([self.IMAGE_MAX_DIM, self.IMAGE_MAX_DIM, 3])
+        self.IMAGE_SHAPE = np.array([height, width, 3])
 
         # Compute backbone size from input image size
         self.BACKBONE_SHAPES = np.array(
