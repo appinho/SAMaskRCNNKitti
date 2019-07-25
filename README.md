@@ -4,4 +4,5 @@
 
 * Replaced keras.engine with keras.layers
 * Replaced keras.topology with keras.savings
-* Replaced scipy.misc.imresize with cv2.resize and swapped height and width
+* Replaced scipy.misc.imresize with cv2.resize (swapped height and width because of OpenCV standard)
+* Added option to not use padding for non-squared images
