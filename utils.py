@@ -434,7 +434,7 @@ def minimize_mask(bbox, mask, mini_shape):
         m = mask[:, :, i]
         y1, x1, y2, x2 = bbox[i][:4]
         m = m[y1:y2, x1:x2]
-        m = cv2.resize(m.astype(float), mini_shape, interpolation=cv2.INTER_AREA)
+        m = cv2.resize(m.astype(float), mini_shape, interpolation=cv2.INTER_LINEAR)
         mini_mask[:, :, i] = np.where(m >= 128, 1, 0)
     return mini_mask
 
