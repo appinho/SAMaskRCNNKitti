@@ -1920,7 +1920,7 @@ class MaskRCNN():
         """
         # Optimizer object
         optimizer = keras.optimizers.SGD(lr=learning_rate, momentum=momentum,
-                                         clipnorm=5.0)
+                                         decay=,clipnorm=5.0)
         # Add Losses
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
@@ -2062,7 +2062,11 @@ class MaskRCNN():
         # Callbacks
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
-                                        histogram_freq=0, write_graph=True, write_images=False),
+                                        histogram_freq=1,
+                                        write_graph=True,
+                                        write_grads=True,
+                                        batch_size=self.config.BATCH_SIZE,
+                                        write_images=True),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
         ]
