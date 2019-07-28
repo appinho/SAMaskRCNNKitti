@@ -2063,11 +2063,12 @@ class MaskRCNN():
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=0,
-                                        write_graph=True,
+                                        write_graph=False,
                                         write_images=False,
-                                        update_freq='epoch'),
+                                        update_freq='epoch',
+                                        ),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=False),
+                                            verbose=0, save_weights_only=True),
         ]
         
         # Common parameters to pass to fit_generator()
@@ -2078,7 +2079,7 @@ class MaskRCNN():
             "validation_steps": self.config.VALIDATION_STPES,
             "max_queue_size": 100,
             "workers": max(self.config.BATCH_SIZE // 2, 2),
-            "use_multiprocessing": False,
+            "use_multiprocessing": True,
         }
         
         # Train
