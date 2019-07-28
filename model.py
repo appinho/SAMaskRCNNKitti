@@ -2064,7 +2064,6 @@ class MaskRCNN():
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=1,
                                         write_graph=True,
-                                        write_grads=False,
                                         batch_size=self.config.BATCH_SIZE,
                                         write_images=True),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
