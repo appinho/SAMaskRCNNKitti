@@ -2064,9 +2064,10 @@ class MaskRCNN():
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=0,
                                         write_graph=True,
-                                        write_images=False),
+                                        write_images=False
+                                        update_freq='batch'),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
-                                            verbose=0, save_weights_only=True),
+                                            verbose=0, save_weights_only=False),
         ]
         
         # Common parameters to pass to fit_generator()
