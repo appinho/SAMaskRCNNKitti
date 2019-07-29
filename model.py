@@ -2070,7 +2070,7 @@ class MaskRCNN():
                                         ),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
-            keras.callbacks.LearningRateScheduler(lambda epoch: self.LEARNING_RATE * 
+            keras.callbacks.LearningRateScheduler(lambda epoch: self.config.LEARNING_RATE * 
                 self.config.LEARNING_RATE_DECAY ** (self.epoch // 2))
         ]
         
