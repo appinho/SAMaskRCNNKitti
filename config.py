@@ -124,6 +124,7 @@ class Config(object):
     # The paper uses lr=0.02, but we found that to cause weights to explode often
     LEARNING_RATE = 0.002
     LEARNING_MOMENTUM = 0.9
+    LEARNING_RATE_DECAY = 0.0002
 
     # Weight decay regularization
     WEIGHT_DECAY = 0.0001

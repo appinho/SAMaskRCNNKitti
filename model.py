@@ -1914,13 +1914,13 @@ class MaskRCNN():
                                 md5_hash='a268eb855778b3df3c7506639542a6af')
         return weights_path
         
-    def compile(self, learning_rate, momentum):
+    def compile(self, learning_rate, momentum, learning_rate_decay):
         """Gets the model ready for training. Adds losses, regularization, and
         metrics. Then calls the Keras compile() function.
         """
         # Optimizer object
         optimizer = keras.optimizers.SGD(lr=learning_rate, momentum=momentum,
-                                         decay=learning_rate/10,clipnorm=5.0)
+                                         decay=learning_rate_decay,clipnorm=5.0)
         # Add Losses
         # First, clear previously set losses to avoid duplication
         self.keras_model._losses = []
@@ -2060,6 +2060,7 @@ class MaskRCNN():
                                             batch_size=self.config.BATCH_SIZE)
 
         # Callbacks
+        #logdir="logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
         callbacks = [
             keras.callbacks.TensorBoard(log_dir=self.log_dir,
                                         histogram_freq=0,
@@ -2069,6 +2070,7 @@ class MaskRCNN():
                                         ),
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
+            keras.callbacks.LearningRateScheduler(learning_rate)
         ]
         
         # Common parameters to pass to fit_generator()
@@ -2086,7 +2088,7 @@ class MaskRCNN():
         log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
         log("Checkpoint Path: {}".format(self.checkpoint_path))
         self.set_trainable(layers)
-        self.compile(learning_rate, self.config.LEARNING_MOMENTUM)
+        self.compile(learning_rate, self.config.LEARNING_MOMENTUM, self.LEARNING_RATE_DECAY)
 
         self.keras_model.fit_generator(
             train_generator,
