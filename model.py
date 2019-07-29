@@ -2088,7 +2088,7 @@ class MaskRCNN():
         log("\nStarting at epoch {}. LR={}\n".format(self.epoch, learning_rate))
         log("Checkpoint Path: {}".format(self.checkpoint_path))
         self.set_trainable(layers)
-        self.compile(learning_rate, self.config.LEARNING_MOMENTUM, self.LEARNING_RATE_DECAY)
+        self.compile(learning_rate, self.config.LEARNING_MOMENTUM, self.config.LEARNING_RATE_DECAY)
 
         self.keras_model.fit_generator(
             train_generator,
