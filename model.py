@@ -2071,7 +2071,7 @@ class MaskRCNN():
             keras.callbacks.ModelCheckpoint(self.checkpoint_path,
                                             verbose=0, save_weights_only=True),
             keras.callbacks.LearningRateScheduler(lambda epoch: self.config.LEARNING_RATE * 
-                exp(-self.config.LEARNING_RATE_DECAY*epoch)
+                exp(-self.config.LEARNING_RATE_DECAY*epoch))
         ]
         
         # Common parameters to pass to fit_generator()
